@@ -57,6 +57,7 @@ static const std::string JOINT_NAMES_PARAM("hardware_interface/joints");
 static const std::string SHUTDOWN_ON_DISCONNECT_ARG("~shutdown_on_disconnect");
 static const std::string MIN_PAYLOAD_ARG("~min_payload");
 static const std::string MAX_PAYLOAD_ARG("~max_payload");
+static const std::string PAYLOAD_ARG("~payload");
 
 static const std::vector<std::string> DEFAULT_JOINTS = { "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
                                                          "wrist_1_joint",      "wrist_2_joint",       "wrist_3_joint" };
@@ -83,6 +84,7 @@ public:
   bool shutdown_on_disconnect;
   double min_payload;
   double max_payload;
+  double payload;
 };
 
 class IgnorePipelineStoppedNotifier : public INotifier
@@ -134,6 +136,7 @@ bool parse_args(ProgArgs &args)
   ros::param::param(SHUTDOWN_ON_DISCONNECT_ARG, args.shutdown_on_disconnect, true);
   ros::param::param(MIN_PAYLOAD_ARG, args.min_payload);
   ros::param::param(MAX_PAYLOAD_ARG, args.max_payload);
+  ros::param::param(PAYLOAD_ARG, args.payload);
   return true;
 }
 
@@ -151,6 +154,23 @@ int main(int argc, char **argv)
   if (!parse_args(args))
   {
     return EXIT_FAILURE;
+  }
+
+  ros::NodeHandle n;
+  ros::ServiceClient client = n.serviceClient<ur_msgs::SetPayload>("ur_driver/set_payload");
+  if(args.payload > args.min_payload && args.payload < args.max_payload)
+  {
+    ur_msgs::SetPayload srv;
+    srv.request.payload = args.payload;
+    if (client.call(srv))
+    {
+      ROS_INFO("Succes: %d", srv.response.success);
+    }
+    else
+    {
+      ROS_ERROR("Failed to call service set_payload");
+      return 1;
+    }
   }
 
   // Add prefix to joint names
