@@ -55,6 +55,8 @@ static const std::string TOOL_FRAME_ARG("~tool_frame");
 static const std::string TCP_LINK_ARG("~tcp_link");
 static const std::string JOINT_NAMES_PARAM("hardware_interface/joints");
 static const std::string SHUTDOWN_ON_DISCONNECT_ARG("~shutdown_on_disconnect");
+static const std::string MIN_PAYLOAD_ARG("~min_payload");
+static const std::string MAX_PAYLOAD_ARG("~max_payload");
 
 static const std::vector<std::string> DEFAULT_JOINTS = { "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
                                                          "wrist_1_joint",      "wrist_2_joint",       "wrist_3_joint" };
@@ -79,6 +81,8 @@ public:
   bool use_ros_control;
   bool use_lowbandwidth_trajectory_follower;
   bool shutdown_on_disconnect;
+  double min_payload;
+  double max_payload;
 };
 
 class IgnorePipelineStoppedNotifier : public INotifier
@@ -128,6 +132,8 @@ bool parse_args(ProgArgs &args)
   ros::param::param(TCP_LINK_ARG, args.tcp_link, args.prefix + "tool0");
   ros::param::param(JOINT_NAMES_PARAM, args.joint_names, DEFAULT_JOINTS);
   ros::param::param(SHUTDOWN_ON_DISCONNECT_ARG, args.shutdown_on_disconnect, true);
+  ros::param::param(MIN_PAYLOAD_ARG, args.min_payload);
+  ros::param::param(MAX_PAYLOAD_ARG, args.max_payload);
   return true;
 }
 
