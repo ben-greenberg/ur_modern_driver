@@ -11,8 +11,8 @@
   <arg name="robot_ip" doc="IP of the controller" />
   <arg name="reverse_ip" default="" doc="IP of the computer running the driver" />
   <arg name="reverse_port" default="50001"/>
-  <arg name="min_payload" />
-  <arg name="max_payload" />
+  <arg name="min_payload"  default="0.0"/>
+  <arg name="max_payload"  default="1.0"/>
   <arg name="payload" />
   <arg name="prefix" default="" />
   <arg name="use_ros_control" default="false"/>

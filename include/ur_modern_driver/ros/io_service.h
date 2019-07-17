@@ -27,6 +27,7 @@
 #include <ur_msgs/SetPayloadResponse.h>
 #include "ur_modern_driver/log.h"
 #include "ur_modern_driver/ur/commander.h"
+#include <std_msgs/Float32.h>
 
 class IOService
 {
@@ -35,6 +36,8 @@ private:
   URCommander& commander_;
   ros::ServiceServer io_service_;
   ros::ServiceServer payload_service_;
+  std_msgs::Float32 min_payload_;
+  std_msgs::Float32 max_payload_;
 
   bool setIO(ur_msgs::SetIORequest& req, ur_msgs::SetIOResponse& resp)
   {

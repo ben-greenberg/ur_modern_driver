@@ -42,6 +42,9 @@
 #include "ur_modern_driver/ur/producer.h"
 #include "ur_modern_driver/ur/rt_state.h"
 #include "ur_modern_driver/ur/state.h"
+#include "ur_msgs/SetPayload.h"
+#include "ur_msgs/SetPayloadRequest.h"
+#include "ur_msgs/SetPayloadResponse.h"
 
 static const std::string IP_ADDR_ARG("~robot_ip_address");
 static const std::string REVERSE_IP_ADDR_ARG("~reverse_ip_address");
@@ -55,8 +58,6 @@ static const std::string TOOL_FRAME_ARG("~tool_frame");
 static const std::string TCP_LINK_ARG("~tcp_link");
 static const std::string JOINT_NAMES_PARAM("hardware_interface/joints");
 static const std::string SHUTDOWN_ON_DISCONNECT_ARG("~shutdown_on_disconnect");
-static const std::string MIN_PAYLOAD_ARG("~min_payload");
-static const std::string MAX_PAYLOAD_ARG("~max_payload");
 static const std::string PAYLOAD_ARG("~payload");
 
 static const std::vector<std::string> DEFAULT_JOINTS = { "shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
@@ -134,8 +135,6 @@ bool parse_args(ProgArgs &args)
   ros::param::param(TCP_LINK_ARG, args.tcp_link, args.prefix + "tool0");
   ros::param::param(JOINT_NAMES_PARAM, args.joint_names, DEFAULT_JOINTS);
   ros::param::param(SHUTDOWN_ON_DISCONNECT_ARG, args.shutdown_on_disconnect, true);
-  ros::param::param(MIN_PAYLOAD_ARG, args.min_payload);
-  ros::param::param(MAX_PAYLOAD_ARG, args.max_payload);
   ros::param::param(PAYLOAD_ARG, args.payload);
   return true;
 }
@@ -155,24 +154,6 @@ int main(int argc, char **argv)
   {
     return EXIT_FAILURE;
   }
-
-  ros::NodeHandle n;
-  ros::ServiceClient client = n.serviceClient<ur_msgs::SetPayload>("ur_driver/set_payload");
-  if(args.payload > args.min_payload && args.payload < args.max_payload)
-  {
-    ur_msgs::SetPayload srv;
-    srv.request.payload = args.payload;
-    if (client.call(srv))
-    {
-      ROS_INFO("Succes: %d", srv.response.success);
-    }
-    else
-    {
-      ROS_ERROR("Failed to call service set_payload");
-      return 1;
-    }
-  }
-
   // Add prefix to joint names
   std::transform(args.joint_names.begin(), args.joint_names.end(), args.joint_names.begin(),
                  [&args](std::string name) { return args.prefix + name; });
